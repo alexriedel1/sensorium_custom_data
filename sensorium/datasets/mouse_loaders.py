@@ -50,6 +50,7 @@ def static_loader(
     include_px_position=None,
     image_reshape_list=None,
     trial_idx_selection=None,
+    extra_transform_func=None,
 ):
     """
     returns a single data loader
@@ -155,13 +156,14 @@ def static_loader(
             np.where(dat.neurons.unit_ids == unit_id)[0][0] for unit_id in neuron_ids
         ]
 
-    more_transforms = [Subsample(idx), ToTensor(cuda)]
-
+    #more_transforms = [Subsample(idx), ToTensor(cuda)]
+    more_transforms = [Subsample(idx),]
     if include_px_position is True:
         more_transforms.insert(0, AddPositionAsChannels())
 
     if scale is not None:
         more_transforms.insert(0, ScaleInputs(scale=scale))
+
 
     if select_input_channel is not None:
         more_transforms.insert(0, SelectInputChannel(select_input_channel))
@@ -185,6 +187,9 @@ def static_loader(
             )
         except:
             more_transforms.insert(0, NeuroNormalizer(dat, exclude=exclude))
+
+    if extra_transform_func is not None:
+        more_transforms.insert(0, extra_transform_func)
 
     dat.transforms.extend(more_transforms)
 
@@ -308,6 +313,7 @@ def static_loaders(
     include_px_position=None,
     image_reshape_list=None,
     trial_idx_selection=None,
+        extra_transform_func=None,
 ):
     """
     Returns a dictionary of dataloaders (i.e., trainloaders, valloaders, and testloaders) for >= 1 dataset(s).
@@ -390,6 +396,7 @@ def static_loaders(
             include_px_position=include_px_position,
             image_reshape_list=image_reshape_list,
             trial_idx_selection=trial_idx_selection,
+              extra_transform_func=extra_transform_func,
         )
         for k in dls:
             dls[k][out[0]] = out[1][k]
