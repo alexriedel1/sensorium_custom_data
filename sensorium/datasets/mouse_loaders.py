@@ -111,6 +111,7 @@ def static_loader(
     data_keys = [
         "images",
         "responses",
+        "images_copy"
     ]
     if include_behavior:
         data_keys.append("behavior")
